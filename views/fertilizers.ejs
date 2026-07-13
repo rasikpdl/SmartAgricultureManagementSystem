@@ -1,0 +1,64 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Fertilizer Log</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<table class="table table-bordered table-hover table-sm">
+  <thead class="table-success">
+    <tr>
+      <th>ID</th><th>Crop (Variety)</th><th>Fertilizer Name</th>
+      <th>Quantity (kg)</th><th>Applied Date</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (rows.length === 0) { %>
+      <tr><td colspan="6" class="text-center text-muted">No fertilizer applications yet. Add one below.</td></tr>
+    <% } %>
+    <% rows.forEach(r => { %>
+    <tr>
+      <td><%= r.fertilizer_id %></td>
+      <td><%= r.crop_name %> (<%= r.variety %>)</td>
+      <td><%= r.fertilizer_name %></td>
+      <td><%= r.quantity_kg %> kg</td>
+      <td><%= r.applied_date ? new Date(r.applied_date).toISOString().split('T')[0] : '' %></td>
+      <td>
+        <form method="POST" action="/fertilizers/delete" style="display:inline">
+          <input type="hidden" name="fertilizer_id" value="<%= r.fertilizer_id %>">
+          <button class="btn btn-sm btn-danger"
+            onclick="return confirm('Delete this fertilizer log?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<hr>
+<h4>Add Fertilizer Application</h4>
+<form method="POST" action="/fertilizers/add" class="row g-2 mt-1">
+  <div class="col-md-3">
+    <select class="form-select" name="crop_id" required>
+      <option value="" disabled selected>Select Crop</option>
+      <% crops.forEach(c => { %>
+        <option value="<%= c.crop_id %>"><%= c.crop_name %> (<%= c.variety %>)</option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="fertilizer_name" placeholder="Fertilizer name" required>
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="quantity_kg" placeholder="Quantity (kg)" type="number" step="0.01" min="0" required>
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="applied_date" type="date" required>
+  </div>
+  <div class="col-md-1">
+    <button class="btn btn-success w-100">Add</button>
+  </div>
+</form>
+
+</div></body></html>

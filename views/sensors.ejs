@@ -1,0 +1,60 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Sensors</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<table class="table table-bordered table-hover table-sm">
+  <thead class="table-success">
+    <tr>
+      <th>ID</th><th>Field Name</th><th>Sensor Type</th>
+      <th>Installed Date</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (rows.length === 0) { %>
+      <tr><td colspan="5" class="text-center text-muted">No sensors yet. Add one below.</td></tr>
+    <% } %>
+    <% rows.forEach(r => { %>
+    <tr>
+      <td><%= r.sensor_id %></td>
+      <td><%= r.field_name %></td>
+      <td><%= r.sensor_type %></td>
+      <td><%= r.installed_date ? new Date(r.installed_date).toISOString().split('T')[0] : '' %></td>
+      <td>
+        <form method="POST" action="/sensors/delete" style="display:inline">
+          <input type="hidden" name="sensor_id" value="<%= r.sensor_id %>">
+          <button class="btn btn-sm btn-danger"
+            onclick="return confirm('Delete this sensor?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<hr>
+<h4>Add a Sensor</h4>
+<form method="POST" action="/sensors/add" class="row g-2 mt-1">
+  <div class="col-md-4">
+    <select class="form-select" name="field_id" required>
+      <option value="" disabled selected>Select Field</option>
+      <% fields.forEach(f => { %>
+        <option value="<%= f.field_id %>"><%= f.field_name %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="sensor_type" placeholder="Sensor Type (e.g. Temperature)" required>
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="installed_date" type="date" required>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-success w-100">Add Sensor</button>
+  </div>
+</form>
+
+</div></body></html>

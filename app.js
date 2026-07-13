@@ -11,6 +11,15 @@ app.use(express.urlencoded({ extended: true }));
 const farmsRouter = require('./routes/farms');
 app.use('/farms', farmsRouter);
 
+const sensorsRouter = require('./routes/sensors');
+app.use('/sensors', sensorsRouter);
+
+const weatherRouter = require('./routes/weather');
+app.use('/weather', weatherRouter);
+
+const fertilizersRouter = require('./routes/fertilizers');
+app.use('/fertilizers', fertilizersRouter);
+
 app.get('/', (req, res) => {
   res.redirect('/farms');
 });

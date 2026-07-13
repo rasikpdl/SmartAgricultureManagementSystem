@@ -1,0 +1,68 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Weather Logs</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<table class="table table-bordered table-hover table-sm">
+  <thead class="table-success">
+    <tr>
+      <th>ID</th><th>Field Name</th><th>Record Date</th>
+      <th>Temperature (°C)</th><th>Rainfall (mm)</th><th>Humidity (%)</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (rows.length === 0) { %>
+      <tr><td colspan="7" class="text-center text-muted">No weather logs yet. Add one below.</td></tr>
+    <% } %>
+    <% rows.forEach(r => { %>
+    <tr>
+      <td><%= r.weather_id %></td>
+      <td><%= r.field_name %></td>
+      <td><%= r.record_date ? new Date(r.record_date).toISOString().split('T')[0] : '' %></td>
+      <td><%= r.temperature %></td>
+      <td><%= r.rainfall_mm %></td>
+      <td><%= r.humidity %></td>
+      <td>
+        <form method="POST" action="/weather/delete" style="display:inline">
+          <input type="hidden" name="weather_id" value="<%= r.weather_id %>">
+          <button class="btn btn-sm btn-danger"
+            onclick="return confirm('Delete this weather log?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<hr>
+<h4>Add a Weather Record</h4>
+<form method="POST" action="/weather/add" class="row g-2 mt-1">
+  <div class="col-md-3">
+    <select class="form-select" name="field_id" required>
+      <option value="" disabled selected>Select Field</option>
+      <% fields.forEach(f => { %>
+        <option value="<%= f.field_id %>"><%= f.field_name %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="record_date" type="date" required>
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="temperature" placeholder="Temp (°C)" type="number" step="0.01">
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="rainfall_mm" placeholder="Rain (mm)" type="number" step="0.01" min="0">
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="humidity" placeholder="Humidity (%)" type="number" step="0.01" min="0" max="100">
+  </div>
+  <div class="col-md-1">
+    <button class="btn btn-success w-100">Add</button>
+  </div>
+</form>
+
+</div></body></html>
