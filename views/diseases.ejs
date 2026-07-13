@@ -1,0 +1,75 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Diseases & Pests</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<table class="table table-bordered table-hover table-sm">
+  <thead class="table-success">
+    <tr>
+      <th>ID</th><th>Crop</th><th>Disease Name</th>
+      <th>Date Detected</th><th>Severity</th><th>Treatment Notes</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (rows.length === 0) { %>
+      <tr><td colspan="7" class="text-center text-muted">No diseases recorded yet. Add one below.</td></tr>
+    <% } %>
+    <% rows.forEach(r => { %>
+    <tr>
+      <td><%= r.disease_id %></td>
+      <td><%= r.crop_name %></td>
+      <td><%= r.disease_name %></td>
+      <td>
+        <%= r.detected_date ? new Date(r.detected_date).toLocaleDateString() : '' %>
+      </td>
+      <td><%= r.severity %></td>
+      <td><%= r.treatment_notes %></td>
+      <td>
+        <form method="POST" action="/diseases/delete" style="display:inline">
+          <input type="hidden" name="disease_id" value="<%= r.disease_id %>">
+          <button class="btn btn-sm btn-danger"
+            onclick="return confirm('Delete this disease record?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<hr>
+<h4>Log a Disease</h4>
+<form method="POST" action="/diseases/add" class="row g-2 mt-1">
+  <div class="col-md-2">
+    <select class="form-select" name="crop_id" required>
+      <option value="" disabled selected>Select a Crop...</option>
+      <% crops.forEach(c => { %>
+        <option value="<%= c.crop_id %>"><%= c.crop_name %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="disease_name" placeholder="Disease Name" required>
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="detected_date" type="date" required>
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="severity">
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+      <option value="Critical">Critical</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="treatment_notes" placeholder="Treatment Notes">
+  </div>
+  <div class="col-md-1">
+    <button class="btn btn-success w-100">Add</button>
+  </div>
+</form>
+
+</div></body></html>

@@ -1,0 +1,47 @@
+<%- include('layout') %>
+
+<h2 class="mb-4">Dashboard Overview</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<div class="row">
+  <!-- Harvests Card -->
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm border-success">
+      <div class="card-body text-center">
+        <h5 class="card-title text-success">Total Harvests</h5>
+        <h1 class="display-4"><%= harvestsCount %></h1>
+        <p class="card-text text-muted">Manage your harvest records.</p>
+        <a href="/harvests" class="btn btn-outline-success w-100">Go to Harvests &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sales Card -->
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm border-primary">
+      <div class="card-body text-center">
+        <h5 class="card-title text-primary">Total Sales</h5>
+        <h1 class="display-4"><%= salesCount %></h1>
+        <p class="card-text text-muted">Manage your financial sales data.</p>
+        <a href="/sales" class="btn btn-outline-primary w-100">Go to Sales &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diseases Card -->
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm border-danger">
+      <div class="card-body text-center">
+        <h5 class="card-title text-danger">Disease Alerts</h5>
+        <h1 class="display-4"><%= diseasesCount %></h1>
+        <p class="card-text text-muted">Log and treat crop diseases.</p>
+        <a href="/diseases" class="btn btn-outline-danger w-100">Go to Diseases &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></body></html>
