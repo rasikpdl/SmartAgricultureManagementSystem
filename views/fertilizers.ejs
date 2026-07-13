@@ -1,0 +1,113 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Fertilizers</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<!-- Step 1, 2 & 3: Farm → Field → Crop filter -->
+<form method="GET" action="/fertilizers" class="mb-4">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label for="farm_id" class="form-label fw-bold">Select Farm:</label>
+      <select name="farm_id" id="farm_id" class="form-select"
+              onchange="this.form.field_id.value=''; this.form.crop_id.value=''; this.form.submit()">
+        <option value="">-- Choose a Farm --</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f.farm_id %>" <%= selectedFarmId == f.farm_id ? 'selected' : '' %>>
+            <%= f.farm_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="field_id" class="form-label fw-bold">Select Field:</label>
+      <select name="field_id" id="field_id" class="form-select"
+              onchange="this.form.crop_id.value=''; this.form.submit()"
+              <%= !selectedFarmId ? 'disabled' : '' %>>
+        <option value="">-- Choose a Field --</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f.field_id %>" <%= selectedFieldId == f.field_id ? 'selected' : '' %>>
+            <%= f.field_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="crop_id" class="form-label fw-bold">Select Crop:</label>
+      <select name="crop_id" id="crop_id" class="form-select"
+              onchange="this.form.submit()"
+              <%= !selectedFieldId ? 'disabled' : '' %>>
+        <option value="">-- Choose a Crop --</option>
+        <% crops.forEach(c => { %>
+          <option value="<%= c.crop_id %>" <%= selectedCropId == c.crop_id ? 'selected' : '' %>>
+            <%= c.crop_name %><%= c.variety ? ' (' + c.variety + ')' : '' %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+</form>
+
+<% if (selectedCropId) { %>
+  <table class="table table-bordered table-hover table-sm">
+    <thead class="table-success">
+      <tr>
+        <th>ID</th><th>Fertilizer Name</th><th>Quantity (kg)</th><th>Applied Date</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (fertilizers.length === 0) { %>
+        <tr><td colspan="5" class="text-center text-muted">No fertilizer records yet for this crop. Add one below.</td></tr>
+      <% } %>
+      <% fertilizers.forEach(r => { %>
+      <tr>
+        <td><%= r.fertilizer_id %></td>
+        <td><%= r.fertilizer_name %></td>
+        <td><%= r.quantity_kg %></td>
+        <td><%= r.applied_date ? new Date(r.applied_date).toISOString().split('T')[0] : '' %></td>
+        <td>
+          <form method="POST" action="/fertilizers/delete" style="display:inline">
+            <input type="hidden" name="fertilizer_id" value="<%= r.fertilizer_id %>">
+            <input type="hidden" name="farm_id"        value="<%= selectedFarmId %>">
+            <input type="hidden" name="field_id"       value="<%= selectedFieldId %>">
+            <input type="hidden" name="crop_id"        value="<%= selectedCropId %>">
+            <button class="btn btn-sm btn-danger"
+                    onclick="return confirm('Delete this fertilizer record?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <hr>
+  <h4>Add a Fertilizer Record</h4>
+  <form method="POST" action="/fertilizers/add" class="row g-2 mt-1">
+    <input type="hidden" name="farm_id"  value="<%= selectedFarmId %>">
+    <input type="hidden" name="field_id" value="<%= selectedFieldId %>">
+    <input type="hidden" name="crop_id"  value="<%= selectedCropId %>">
+    <div class="col-md-3">
+      <input class="form-control" name="fertilizer_name" placeholder="Fertilizer Name" required>
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="number" step="0.01" name="quantity_kg" placeholder="Quantity (kg)">
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="date" name="applied_date" title="Applied Date">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-success w-100">Add</button>
+    </div>
+  </form>
+
+<% } else if (selectedFieldId) { %>
+  <div class="alert alert-info">Please select a crop to view its fertilizer records.</div>
+<% } else if (selectedFarmId) { %>
+  <div class="alert alert-info">Please select a field next.</div>
+<% } else { %>
+  <div class="alert alert-info">Please select a farm first.</div>
+<% } %>
+
+</div></body></html>

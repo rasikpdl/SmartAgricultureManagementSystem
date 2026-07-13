@@ -1,0 +1,103 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Crops</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<form method="GET" action="/crops" class="mb-4">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label for="farm_id" class="form-label fw-bold">Select Farm:</label>
+      <select name="farm_id" id="farm_id" class="form-select" onchange="this.form.field_id.value=''; this.form.submit()">
+        <option value="">-- Choose a Farm --</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f.farm_id %>" <%= selectedFarmId == f.farm_id ? 'selected' : '' %>>
+            <%= f.farm_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="field_id" class="form-label fw-bold">Select Field:</label>
+      <select name="field_id" id="field_id" class="form-select" onchange="this.form.submit()" <%= !selectedFarmId ? 'disabled' : '' %>>
+        <option value="">-- Choose a Field --</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f.field_id %>" <%= selectedFieldId == f.field_id ? 'selected' : '' %>>
+            <%= f.field_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+</form>
+
+<% if (selectedFieldId) { %>
+  <table class="table table-bordered table-hover table-sm">
+    <thead class="table-success">
+      <tr>
+        <th>ID</th><th>Crop Name</th><th>Variety</th><th>Planting Date</th><th>Expected Harvest</th><th>Status</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (crops.length === 0) { %>
+        <tr><td colspan="7" class="text-center text-muted">No crops yet for this field. Add one below.</td></tr>
+      <% } %>
+      <% crops.forEach(r => { %>
+      <tr>
+        <td><%= r.crop_id %></td>
+        <td><%= r.crop_name %></td>
+        <td><%= r.variety %></td>
+        <td><%= r.planting_date ? new Date(r.planting_date).toISOString().split('T')[0] : '' %></td>
+        <td><%= r.expected_harvest_date ? new Date(r.expected_harvest_date).toISOString().split('T')[0] : '' %></td>
+        <td><%= r.status %></td>
+        <td>
+          <form method="POST" action="/crops/delete" style="display:inline">
+            <input type="hidden" name="crop_id" value="<%= r.crop_id %>">
+            <input type="hidden" name="farm_id" value="<%= selectedFarmId %>">
+            <input type="hidden" name="field_id" value="<%= selectedFieldId %>">
+            <button class="btn btn-sm btn-danger"
+              onclick="return confirm('Delete this crop?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <hr>
+  <h4>Add a Crop</h4>
+  <form method="POST" action="/crops/add" class="row g-2 mt-1">
+    <input type="hidden" name="farm_id" value="<%= selectedFarmId %>">
+    <input type="hidden" name="field_id" value="<%= selectedFieldId %>">
+    <div class="col-md-2">
+      <input class="form-control" name="crop_name" placeholder="Crop name" required>
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" name="variety" placeholder="Variety">
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="date" name="planting_date" placeholder="Planting Date" title="Planting Date">
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="date" name="expected_harvest_date" placeholder="Harvest Date" title="Expected Harvest Date">
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="growing">Growing</option>
+        <option value="harvested">Harvested</option>
+        <option value="failed">Failed</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-success w-100">Add</button>
+    </div>
+  </form>
+<% } else if (selectedFarmId) { %>
+  <div class="alert alert-info">Please select a field to view its crops.</div>
+<% } else { %>
+  <div class="alert alert-info">Please select a farm first.</div>
+<% } %>
+
+</div></body></html>

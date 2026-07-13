@@ -1,0 +1,99 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Weather Records</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<!-- Step 1 & 2: Farm → Field filter -->
+<form method="GET" action="/weather" class="mb-4">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label for="farm_id" class="form-label fw-bold">Select Farm:</label>
+      <select name="farm_id" id="farm_id" class="form-select"
+              onchange="this.form.field_id.value=''; this.form.submit()">
+        <option value="">-- Choose a Farm --</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f.farm_id %>" <%= selectedFarmId == f.farm_id ? 'selected' : '' %>>
+            <%= f.farm_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="field_id" class="form-label fw-bold">Select Field:</label>
+      <select name="field_id" id="field_id" class="form-select"
+              onchange="this.form.submit()" <%= !selectedFarmId ? 'disabled' : '' %>>
+        <option value="">-- Choose a Field --</option>
+        <% fields.forEach(f => { %>
+          <option value="<%= f.field_id %>" <%= selectedFieldId == f.field_id ? 'selected' : '' %>>
+            <%= f.field_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+</form>
+
+<% if (selectedFieldId) { %>
+  <table class="table table-bordered table-hover table-sm">
+    <thead class="table-info">
+      <tr>
+        <th>ID</th><th>Date</th><th>Temperature (°C)</th><th>Rainfall (mm)</th><th>Humidity (%)</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (weatherRecords.length === 0) { %>
+        <tr><td colspan="6" class="text-center text-muted">No weather records yet for this field. Add one below.</td></tr>
+      <% } %>
+      <% weatherRecords.forEach(r => { %>
+      <tr>
+        <td><%= r.weather_id %></td>
+        <td><%= r.record_date ? new Date(r.record_date).toISOString().split('T')[0] : '' %></td>
+        <td><%= r.temperature %></td>
+        <td><%= r.rainfall_mm %></td>
+        <td><%= r.humidity %></td>
+        <td>
+          <form method="POST" action="/weather/delete" style="display:inline">
+            <input type="hidden" name="weather_id" value="<%= r.weather_id %>">
+            <input type="hidden" name="farm_id"    value="<%= selectedFarmId %>">
+            <input type="hidden" name="field_id"   value="<%= selectedFieldId %>">
+            <button class="btn btn-sm btn-danger"
+                    onclick="return confirm('Delete this weather record?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <hr>
+  <h4>Add a Weather Record</h4>
+  <form method="POST" action="/weather/add" class="row g-2 mt-1">
+    <input type="hidden" name="farm_id"  value="<%= selectedFarmId %>">
+    <input type="hidden" name="field_id" value="<%= selectedFieldId %>">
+    <div class="col-md-2">
+      <input class="form-control" type="date" name="record_date" title="Record Date" required>
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="number" step="0.01" name="temperature" placeholder="Temp (°C)">
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="number" step="0.01" name="rainfall_mm" placeholder="Rainfall (mm)">
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="number" step="0.01" name="humidity" placeholder="Humidity (%)">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-success w-100">Add</button>
+    </div>
+  </form>
+
+<% } else if (selectedFarmId) { %>
+  <div class="alert alert-info">Please select a field to view its weather records.</div>
+<% } else { %>
+  <div class="alert alert-info">Please select a farm first.</div>
+<% } %>
+
+</div></body></html>

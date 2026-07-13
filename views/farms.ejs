@@ -1,0 +1,60 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Farms</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<table class="table table-bordered table-hover table-sm">
+  <thead class="table-success">
+    <tr>
+      <th>ID</th><th>Farm Name</th><th>Owner</th>
+      <th>Location</th><th>Area (ha)</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (rows.length === 0) { %>
+      <tr><td colspan="6" class="text-center text-muted">No farms yet. Add one below.</td></tr>
+    <% } %>
+    <% rows.forEach(r => { %>
+    <tr>
+      <td><%= r.farm_id %></td>
+      <td><%= r.farm_name %></td>
+      <td><%= r.owner_name %></td>
+      <td><%= r.location %></td>
+      <td><%= r.area_hectares %></td>
+      <td>
+        <form method="POST" action="/farms/delete" style="display:inline">
+          <input type="hidden" name="farm_id" value="<%= r.farm_id %>">
+          <button class="btn btn-sm btn-danger"
+            onclick="return confirm('Delete this farm?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<hr>
+<h4>Add a Farm</h4>
+<form method="POST" action="/farms/add" class="row g-2 mt-1">
+  <div class="col-md-3">
+    <input class="form-control" name="farm_name" placeholder="Farm name" required>
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="owner_name" placeholder="Owner name">
+  </div>
+  <div class="col-md-3">
+    <input class="form-control" name="location" placeholder="Location">
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="area_hectares" placeholder="Area (ha)"
+      type="number" step="0.01" min="0">
+  </div>
+  <div class="col-md-1">
+    <button class="btn btn-success w-100">Add</button>
+  </div>
+</form>
+
+</div></body></html>

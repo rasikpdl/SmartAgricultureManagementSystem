@@ -1,0 +1,79 @@
+<%- include('layout') %>
+
+<h2 class="mb-3">Fields</h2>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<form method="GET" action="/fields" class="mb-4">
+  <div class="row g-2 align-items-center">
+    <div class="col-auto">
+      <label for="farm_id" class="col-form-label fw-bold">Select Farm:</label>
+    </div>
+    <div class="col-auto">
+      <select name="farm_id" id="farm_id" class="form-select" onchange="this.form.submit()">
+        <option value="">-- Choose a Farm --</option>
+        <% farms.forEach(f => { %>
+          <option value="<%= f.farm_id %>" <%= selectedFarmId == f.farm_id ? 'selected' : '' %>>
+            <%= f.farm_name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+</form>
+
+<% if (selectedFarmId) { %>
+  <table class="table table-bordered table-hover table-sm">
+    <thead class="table-success">
+      <tr>
+        <th>ID</th><th>Field Name</th><th>Area (ha)</th><th>Soil Type</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (fields.length === 0) { %>
+        <tr><td colspan="5" class="text-center text-muted">No fields yet for this farm. Add one below.</td></tr>
+      <% } %>
+      <% fields.forEach(r => { %>
+      <tr>
+        <td><%= r.field_id %></td>
+        <td><%= r.field_name %></td>
+        <td><%= r.area_hectares %></td>
+        <td><%= r.soil_type %></td>
+        <td>
+          <form method="POST" action="/fields/delete" style="display:inline">
+            <input type="hidden" name="field_id" value="<%= r.field_id %>">
+            <input type="hidden" name="farm_id" value="<%= selectedFarmId %>">
+            <button class="btn btn-sm btn-danger"
+              onclick="return confirm('Delete this field?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <hr>
+  <h4>Add a Field</h4>
+  <form method="POST" action="/fields/add" class="row g-2 mt-1">
+    <input type="hidden" name="farm_id" value="<%= selectedFarmId %>">
+    <div class="col-md-4">
+      <input class="form-control" name="field_name" placeholder="Field name" required>
+    </div>
+    <div class="col-md-3">
+      <input class="form-control" name="area_hectares" placeholder="Area (ha)"
+        type="number" step="0.01" min="0">
+    </div>
+    <div class="col-md-3">
+      <input class="form-control" name="soil_type" placeholder="Soil type">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-success w-100">Add</button>
+    </div>
+  </form>
+<% } else { %>
+  <div class="alert alert-info">Please select a farm to view its fields.</div>
+<% } %>
+
+</div></body></html>
