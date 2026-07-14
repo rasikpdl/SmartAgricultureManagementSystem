@@ -6,42 +6,394 @@
   <div class="alert alert-danger"><%= error %></div>
 <% } %>
 
-<div class="row">
-  <!-- Harvests Card -->
-  <div class="col-md-4 mb-3">
+<!-- ── Summary Cards ── -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3">
     <div class="card shadow-sm border-success">
       <div class="card-body text-center">
         <h5 class="card-title text-success">Total Harvests</h5>
         <h1 class="display-4"><%= harvestsCount %></h1>
-        <p class="card-text text-muted">Manage your harvest records.</p>
-        <a href="/harvests" class="btn btn-outline-success w-100">Go to Harvests &rarr;</a>
+        <a href="/harvests" class="btn btn-outline-success btn-sm w-100">Go to Harvests &rarr;</a>
       </div>
     </div>
   </div>
-
-  <!-- Sales Card -->
-  <div class="col-md-4 mb-3">
+  <div class="col-md-3 mb-3">
     <div class="card shadow-sm border-primary">
       <div class="card-body text-center">
         <h5 class="card-title text-primary">Total Sales</h5>
         <h1 class="display-4"><%= salesCount %></h1>
-        <p class="card-text text-muted">Manage your financial sales data.</p>
-        <a href="/sales" class="btn btn-outline-primary w-100">Go to Sales &rarr;</a>
+        <a href="/sales" class="btn btn-outline-primary btn-sm w-100">Go to Sales &rarr;</a>
       </div>
     </div>
   </div>
-
-  <!-- Diseases Card -->
-  <div class="col-md-4 mb-3">
+  <div class="col-md-3 mb-3">
     <div class="card shadow-sm border-danger">
       <div class="card-body text-center">
         <h5 class="card-title text-danger">Disease Alerts</h5>
         <h1 class="display-4"><%= diseasesCount %></h1>
-        <p class="card-text text-muted">Log and treat crop diseases.</p>
-        <a href="/diseases" class="btn btn-outline-danger w-100">Go to Diseases &rarr;</a>
+        <a href="/diseases" class="btn btn-outline-danger btn-sm w-100">Go to Diseases &rarr;</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card shadow-sm border-warning">
+      <div class="card-body text-center">
+        <h5 class="card-title text-warning">Total Revenue</h5>
+        <h2>Rs. <%= parseFloat(totalRevenue).toLocaleString() %></h2>
+        <p class="text-muted mb-0">from all sales</p>
       </div>
     </div>
   </div>
 </div>
 
-</div></body></html>
+<!-- ── Quick Stats Row ── -->
+<div class="row mb-4">
+  <div class="col-md-2 mb-2">
+    <div class="card text-center shadow-sm">
+      <div class="card-body py-2">
+        <h6 class="text-muted mb-0">Farms</h6>
+        <h3 class="mb-0"><%= farmsCount %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 mb-2">
+    <div class="card text-center shadow-sm">
+      <div class="card-body py-2">
+        <h6 class="text-muted mb-0">Fields</h6>
+        <h3 class="mb-0"><%= fieldsCount %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 mb-2">
+    <div class="card text-center shadow-sm">
+      <div class="card-body py-2">
+        <h6 class="text-muted mb-0">Crops</h6>
+        <h3 class="mb-0"><%= cropsCount %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 mb-2">
+    <div class="card text-center shadow-sm">
+      <div class="card-body py-2">
+        <h6 class="text-muted mb-0">Sensors</h6>
+        <h3 class="mb-0"><%= sensorsCount %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 mb-2">
+    <div class="card text-center shadow-sm">
+      <div class="card-body py-2">
+        <h6 class="text-muted mb-0">Total Yield</h6>
+        <h5 class="mb-0"><%= parseFloat(totalHarvestYield).toLocaleString() %> kg</h5>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 mb-2">
+    <div class="card text-center shadow-sm">
+      <div class="card-body py-2">
+        <h6 class="text-muted mb-0">Farm Area</h6>
+        <h5 class="mb-0"><%= parseFloat(totalFarmArea).toLocaleString() %> ha</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Charts Row ── -->
+<div class="row mb-4">
+  <div class="col-md-6 mb-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Harvest Yield by Crop <small class="text-muted">(INNER JOIN + GROUP BY)</small></h5>
+        <canvas id="harvestByCropChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Sales Revenue by Crop <small class="text-muted">(3-Table JOIN)</small></h5>
+        <canvas id="salesByCropChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Crop Status <small class="text-muted">(GROUP BY)</small></h5>
+        <canvas id="cropStatusChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Disease Severity <small class="text-muted">(GROUP BY)</small></h5>
+        <canvas id="diseaseSeverityChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Harvest Quality <small class="text-muted">(GROUP BY)</small></h5>
+        <canvas id="harvestQualityChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ── Farm Overview Table (LEFT JOIN + GROUP BY + SUM) ── -->
+<h4>Farm Overview <small class="text-muted">(LEFT JOIN + GROUP BY + SUM)</small></h4>
+<table class="table table-bordered table-hover table-sm mb-4">
+  <thead class="table-success">
+    <tr>
+      <th>Farm Name</th><th>Owner</th><th>Location</th>
+      <th>Farm Area (ha)</th><th>Fields</th><th>Fields Area (ha)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (farmOverview.length === 0) { %>
+      <tr><td colspan="6" class="text-center text-muted">No farm data available</td></tr>
+    <% } %>
+    <% farmOverview.forEach(row => { %>
+      <tr>
+        <td><%= row.farm_name %></td>
+        <td><%= row.owner_name %></td>
+        <td><%= row.location %></td>
+        <td><%= row.area_hectares %></td>
+        <td><%= row.field_count %></td>
+        <td><%= row.fields_area %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- ── Recent Sales Table (5-Table INNER JOIN) ── -->
+<h4>Recent Sales <small class="text-muted">(5-Table INNER JOIN)</small></h4>
+<table class="table table-bordered table-hover table-sm mb-4">
+  <thead class="table-success">
+    <tr>
+      <th>Date</th><th>Buyer</th><th>Crop</th><th>Farm</th>
+      <th>Qty Sold (kg)</th><th>Price/kg</th><th>Total (Rs.)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (recentSales.length === 0) { %>
+      <tr><td colspan="7" class="text-center text-muted">No sales data available</td></tr>
+    <% } %>
+    <% recentSales.forEach(row => { %>
+      <tr>
+        <td><%= row.sale_date ? new Date(row.sale_date).toLocaleDateString() : '' %></td>
+        <td><%= row.buyer_name %></td>
+        <td><%= row.crop_name %></td>
+        <td><%= row.farm_name %></td>
+        <td><%= row.quantity_sold_kg %></td>
+        <td>Rs. <%= row.price_per_kg %></td>
+        <td><strong>Rs. <%= parseFloat(row.line_total).toLocaleString() %></strong></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- ── Disease Alerts Table (4-Table INNER JOIN) ── -->
+<h4>Disease Alerts <small class="text-muted">(4-Table INNER JOIN)</small></h4>
+<table class="table table-bordered table-hover table-sm mb-4">
+  <thead class="table-success">
+    <tr>
+      <th>Disease</th><th>Severity</th><th>Detected</th>
+      <th>Crop</th><th>Farm</th><th>Treatment Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (diseaseAlerts.length === 0) { %>
+      <tr><td colspan="6" class="text-center text-muted">No disease data available</td></tr>
+    <% } %>
+    <% diseaseAlerts.forEach(row => { %>
+      <tr>
+        <td><%= row.disease_name %></td>
+        <td>
+          <span class="badge
+            <% if (row.severity === 'high') { %>bg-danger<% } %>
+            <% if (row.severity === 'medium') { %>bg-warning text-dark<% } %>
+            <% if (row.severity === 'low') { %>bg-success<% } %>
+          "><%= row.severity %></span>
+        </td>
+        <td><%= row.detected_date ? new Date(row.detected_date).toLocaleDateString() : '' %></td>
+        <td><%= row.crop_name %></td>
+        <td><%= row.farm_name %></td>
+        <td><%= row.treatment_notes %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- ── Weather Averages Table (JOIN + AVG + ROUND) ── -->
+<h4>Weather Averages by Field <small class="text-muted">(JOIN + AVG + ROUND)</small></h4>
+<table class="table table-bordered table-hover table-sm mb-4">
+  <thead class="table-success">
+    <tr>
+      <th>Field</th><th>Farm</th><th>Avg Temp (&deg;C)</th>
+      <th>Avg Rainfall (mm)</th><th>Avg Humidity (%)</th><th>Readings</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (weatherAvg.length === 0) { %>
+      <tr><td colspan="6" class="text-center text-muted">No weather data</td></tr>
+    <% } %>
+    <% weatherAvg.forEach(row => { %>
+      <tr>
+        <td><%= row.field_name %></td>
+        <td><%= row.farm_name %></td>
+        <td><%= row.avg_temp %>&deg;</td>
+        <td><%= row.avg_rain %></td>
+        <td><%= row.avg_humidity %>%</td>
+        <td><%= row.readings %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- ── Fertilizer Usage Table (JOIN + SUM + GROUP BY) ── -->
+<h4>Fertilizer Usage by Crop <small class="text-muted">(INNER JOIN + SUM + GROUP BY)</small></h4>
+<table class="table table-bordered table-hover table-sm mb-4">
+  <thead class="table-success">
+    <tr>
+      <th>Crop</th><th>Fertilizer</th><th>Total Qty (kg)</th><th>Applications</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (fertilizerUsage.length === 0) { %>
+      <tr><td colspan="4" class="text-center text-muted">No fertilizer data</td></tr>
+    <% } %>
+    <% fertilizerUsage.forEach(row => { %>
+      <tr>
+        <td><%= row.crop_name %></td>
+        <td><%= row.fertilizer_name %></td>
+        <td><%= row.total_kg %> kg</td>
+        <td><%= row.applications %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- ── Sensor Deployment Table (JOIN + STRING_AGG) ── -->
+<h4>Sensor Deployment <small class="text-muted">(JOIN + STRING_AGG)</small></h4>
+<table class="table table-bordered table-hover table-sm mb-4">
+  <thead class="table-success">
+    <tr>
+      <th>Field</th><th>Farm</th><th>Sensor Count</th><th>Sensor Types</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (sensorsByField.length === 0) { %>
+      <tr><td colspan="4" class="text-center text-muted">No sensor data</td></tr>
+    <% } %>
+    <% sensorsByField.forEach(row => { %>
+      <tr>
+        <td><%= row.field_name %></td>
+        <td><%= row.farm_name %></td>
+        <td><%= row.sensor_count %></td>
+        <td><%= row.types %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+</div></body>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  /* ── Harvest by Crop – Bar Chart ── */
+  const harvestData = <%- JSON.stringify(harvestByCrop) %>;
+  new Chart(document.getElementById('harvestByCropChart'), {
+    type: 'bar',
+    data: {
+      labels: harvestData.map(d => d.crop_name),
+      datasets: [{
+        label: 'Total Yield (kg)',
+        data: harvestData.map(d => parseFloat(d.total_kg)),
+        backgroundColor: ['#198754','#0d6efd','#ffc107','#dc3545','#6f42c1'],
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  /* ── Sales Revenue by Crop – Bar Chart ── */
+  const salesData = <%- JSON.stringify(salesByCrop) %>;
+  new Chart(document.getElementById('salesByCropChart'), {
+    type: 'bar',
+    data: {
+      labels: salesData.map(d => d.crop_name),
+      datasets: [{
+        label: 'Revenue (Rs.)',
+        data: salesData.map(d => parseFloat(d.revenue)),
+        backgroundColor: '#0d6efd',
+        borderWidth: 1,
+      },{
+        label: 'Qty Sold (kg)',
+        data: salesData.map(d => parseFloat(d.qty_sold)),
+        backgroundColor: '#198754',
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  /* ── Crop Status – Pie Chart ── */
+  const statusData = <%- JSON.stringify(cropStatus) %>;
+  new Chart(document.getElementById('cropStatusChart'), {
+    type: 'pie',
+    data: {
+      labels: statusData.map(d => d.status),
+      datasets: [{
+        data: statusData.map(d => parseInt(d.cnt)),
+        backgroundColor: ['#198754','#0d6efd','#ffc107','#dc3545'],
+      }]
+    },
+    options: { responsive: true }
+  });
+
+  /* ── Disease by Severity – Doughnut ── */
+  const sevData = <%- JSON.stringify(diseaseBySeverity) %>;
+  const sevColorMap = { high: '#dc3545', medium: '#ffc107', low: '#198754' };
+  new Chart(document.getElementById('diseaseSeverityChart'), {
+    type: 'doughnut',
+    data: {
+      labels: sevData.map(d => d.severity),
+      datasets: [{
+        data: sevData.map(d => parseInt(d.cnt)),
+        backgroundColor: sevData.map(d => sevColorMap[d.severity] || '#6c757d'),
+      }]
+    },
+    options: { responsive: true }
+  });
+
+  /* ── Harvest Quality – Polar Area ── */
+  const qualData = <%- JSON.stringify(harvestQuality) %>;
+  new Chart(document.getElementById('harvestQualityChart'), {
+    type: 'polarArea',
+    data: {
+      labels: qualData.map(d => 'Grade ' + d.quality_grade),
+      datasets: [{
+        data: qualData.map(d => parseFloat(d.total_kg)),
+        backgroundColor: ['#19875488','#0d6efd88','#ffc10788','#dc354588'],
+      }]
+    },
+    options: { responsive: true }
+  });
+</script>
+</html>
